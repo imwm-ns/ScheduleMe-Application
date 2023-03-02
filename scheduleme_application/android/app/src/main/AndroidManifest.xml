@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.scheduleme_application">
    <application
-        android:label="scheduleme_application"
+        android:label="ScheduleMe"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
