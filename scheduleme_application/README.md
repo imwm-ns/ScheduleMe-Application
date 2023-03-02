@@ -1,6 +1,4 @@
-# scheduleme_application
-
-A new Flutter project.
+# ScheduleMe-Application
 
 ## Getting Started
 
