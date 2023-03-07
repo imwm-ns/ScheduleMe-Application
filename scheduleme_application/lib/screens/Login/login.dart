@@ -231,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                   Container(
-                                    margin: const EdgeInsetsDirectional.only(start: 50),
+                                    margin: const EdgeInsetsDirectional.only(start: 40),
                                     child: Row(
                                       children: [
                                         Image.asset("assets/icon/google_logo.png"),
