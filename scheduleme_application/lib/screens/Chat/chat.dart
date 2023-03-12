@@ -41,17 +41,6 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Column(
         children: [
           Expanded(
-            child: Obx(
-              () => Container(
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Text(
-                  "Connected User ${chatController.connectedUser}",
-                  style: TextStyle(color: Color(0xff000000), fontSize: 15),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
             flex: 9,
             child: Obx(
               () => ListView.builder(
