@@ -46,6 +46,8 @@ dependencies:
   #Real Time Chat
   socket_io_client: ^2.0.1
   get: ^4.6.5
+  # Calendar
+  table_calendar: ^3.0.8
 
 dev_dependencies:
   flutter_test:
