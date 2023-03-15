@@ -16,7 +16,7 @@ class CreateProfileScreen extends StatefulWidget {
 }
 
 class _CreateProfileScreenState extends State<CreateProfileScreen> {
-  Profile profile = Profile(fullName: '', id: '', faculty: '', major: '');
+  Profile profile = Profile(fullName: '', id: '', faculty: '', major: '', chatID: '');
 
   final formKey = GlobalKey<FormState>();
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -189,7 +189,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                               "faculty": profile.faculty,
                                               "major": profile.major,
                                               "uid": auth.currentUser!.uid,
+                                              "chatID": profile.id
+                                                  .substring(profile.id.length - 5),
                                             });
+                                            print(profile.id
+                                                .substring(profile.id.length - 5));
                                             formKey.currentState!.reset();
                                             Navigator.pushReplacement(context,
                                                 MaterialPageRoute(builder: (context) {
