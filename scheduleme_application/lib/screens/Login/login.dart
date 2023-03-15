@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:scheduleme_application/models/account.dart';
 import 'package:scheduleme_application/screens/Login/create_profile.dart';
+import 'package:scheduleme_application/screens/Login/forgot_password.dart';
 import 'package:scheduleme_application/screens/Login/register.dart';
 import 'package:scheduleme_application/screens/Widgets/mainbuttom.dart';
 import 'package:scheduleme_application/services/auth_service.dart';
@@ -142,7 +143,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     margin: const EdgeInsets.only(left: 180),
                                     child: SizedBox(
                                         child: TextButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pushReplacement(context,
+                                            MaterialPageRoute(
+                                          builder: (context) {
+                                            return ForgotPasswordScreen();
+                                          },
+                                        ));
+                                      },
                                       style: TextButton.styleFrom(
                                           foregroundColor: const Color(0xff392AAB)),
                                       child: const Text(
