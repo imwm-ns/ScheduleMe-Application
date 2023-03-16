@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:scheduleme_application/screens/Chat/chat.dart';
+import 'package:scheduleme_application/screens/Chat/overview_chat.dart';
+
 import 'package:scheduleme_application/screens/Home/home.dart';
 import 'package:scheduleme_application/screens/Profile/profile_display.dart';
 import 'package:scheduleme_application/screens/Schedule/schedule.dart';
@@ -20,7 +21,7 @@ class _MainBottomState extends State<MainBottom> {
   final pageList = [
     const HomeScreen(),
     const ScheduleScreen(),
-    const ChatScreen(),
+    const OverviewScreen(),
     const ProfileDisplayScreen()
   ];
 

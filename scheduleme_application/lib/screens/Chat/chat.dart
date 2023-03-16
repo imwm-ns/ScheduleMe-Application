@@ -8,6 +8,8 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:scheduleme_application/controller/chat_controller.dart';
 import 'package:scheduleme_application/models/message.dart';
 import 'package:scheduleme_application/screens/Chat/message_items.dart';
+import 'package:scheduleme_application/screens/Chat/overview_chat.dart';
+import 'package:scheduleme_application/screens/Widgets/mainbuttom.dart';
 
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -40,8 +42,24 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Container(
       child: Column(
         children: [
+          Row(children: [
+            Padding(
+                padding: const EdgeInsets.only(left: 10, top: 80),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) {
+                        return const MainBottom();
+                      },
+                    ));
+                  },
+                  icon: Icon(Icons.arrow_back),
+                  color: Color(0xff392AAB),
+                  iconSize: 30,
+                )),
+          ]),
           Expanded(
-            flex: 9,
+            flex: 6,
             child: Obx(
               () => ListView.builder(
                   itemCount: chatController.chatMessage.length,
@@ -56,7 +74,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.only(left: 20, right: 20),
               child: TextField(
                 cursorColor: Color(0xff88889D),
                 controller: msgInputController,
