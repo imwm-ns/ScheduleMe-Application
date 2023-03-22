@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -12,19 +13,39 @@ class OverviewScreen extends StatefulWidget {
 }
 
 class _OverviewScreenState extends State<OverviewScreen> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
   late CollectionReference collectionReference = fireStore.collection('Profile');
   TextEditingController msgInputController = TextEditingController();
-  String nameKey = "";
+
+  String email = "";
+  bool hasEmail = false;
+  var searchAccount = [];
 
   void initState() {
     super.initState();
+    _getCurrentUserData();
   }
 
-  Future<List<Object?>> _getData() async {
-    QuerySnapshot querySnapshot = await collectionReference.get();
-    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    return allData;
+  Future<void> _getCurrentUserData() async {
+    final currentUser = await auth.currentUser!;
+    if (currentUser != Null) {
+      final collectionReference = fireStore.collection('Profile');
+      final documentReference = await collectionReference.get();
+      documentReference.docs.forEach((element) {
+        if (element.exists && element.get("email") != auth.currentUser!.email) {
+          final snapShotEmail = element.get("email");
+          final snapShotFullName = element.get("full_name");
+          final snapShotID = element.get("id");
+          var currentInfo = [
+            snapShotEmail.toString(),
+            snapShotFullName.toString(),
+            snapShotID.toString()
+          ];
+          searchAccount.add(currentInfo);
+        }
+      });
+    }
   }
 
   @override
@@ -67,7 +88,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     margin: const EdgeInsets.only(right: 10),
                     child: IconButton(
                       onPressed: () {
-                        searchClient(msgInputController.text);
+                        email = msgInputController.text;
+                        hasEmail = true;
+                        setState(() {});
                         msgInputController.text = "";
                       },
                       icon: Icon(Icons.search),
@@ -78,23 +101,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 ),
               ),
             ),
-            Container(
-              child: Expanded(
-                child: StreamBuilder(
-                  stream: collectionReference.snapshots(),
-                  builder: ((context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    return ListView(
-                      children: getUserItems(snapshot),
-                    );
-                  }),
-                ),
-              ),
-            ),
+            SingleChildScrollView(
+              child: hasEmail ? showAccount(email) : Text(""),
+            )
           ],
         ),
       ),
@@ -102,41 +111,35 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  List<Widget> getUserItems(AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-    return snapshot.data!.docs.map(
-      (doc) {
-        if (nameKey == doc.get("full_name")) {
-          return TextButton(
-            onPressed: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) {
-                  nameKey = "";
-                  return const ChatScreen();
-                },
-              ));
-            },
-            child: Container(
-              child: ListTile(
-                leading: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Color(0xff392AAB),
-                  foregroundColor: Colors.white,
-                  child: FittedBox(
-                    child: Text(doc["full_name"].toString()[0]),
-                  ),
+  TextButton showAccount(String msg) {
+    for (List account in searchAccount) {
+      if (account[0] == msg) {
+        return TextButton(
+          onPressed: () {
+            Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) {
+                email = "";
+                return const ChatScreen();
+              },
+            ));
+          },
+          child: Container(
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                backgroundColor: Color(0xff392AAB),
+                foregroundColor: Colors.white,
+                child: FittedBox(
+                  child: Text(account[1].toString().substring(0, 1)),
                 ),
-                title: Text(doc["full_name"]),
-                subtitle: Text(doc["id"]),
               ),
+              title: Text(account[1].toString()),
+              subtitle: Text(account[2].toString()),
             ),
-          );
-        }
-        return new Text("");
-      },
-    ).toList();
-  }
-
-  void searchClient(String text) {
-    nameKey = text;
+          ),
+        );
+      }
+    }
+    return TextButton(onPressed: () {}, child: Container());
   }
 }

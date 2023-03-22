@@ -191,9 +191,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                               "uid": auth.currentUser!.uid,
                                               "chatID": profile.id
                                                   .substring(profile.id.length - 5),
+                                              "email": auth.currentUser!.email,
                                             });
-                                            print(profile.id
-                                                .substring(profile.id.length - 5));
                                             formKey.currentState!.reset();
                                             Navigator.pushReplacement(context,
                                                 MaterialPageRoute(builder: (context) {

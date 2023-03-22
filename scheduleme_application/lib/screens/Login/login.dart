@@ -322,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(40))),
                               child: const Text(
-                                "SIGN-IN",
+                                "SIGN-UP",
                                 style: TextStyle(
                                     color: Color(0xff392AAB),
                                     fontSize: 16,
