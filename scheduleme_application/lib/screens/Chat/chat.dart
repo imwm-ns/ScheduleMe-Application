@@ -29,7 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    socket = IO.io('${serverIP}:4000',
+    socket = IO.io('${serverIP}:12000',
         IO.OptionBuilder().setTransports(['websocket']).disableAutoConnect().build());
     socket.connect();
     setUpSocketListener();

@@ -5,7 +5,7 @@ import 'package:scheduleme_application/screens/Chat/overview_chat.dart';
 
 import 'package:scheduleme_application/screens/Home/home.dart';
 import 'package:scheduleme_application/screens/Profile/profile_display.dart';
-import 'package:scheduleme_application/screens/Schedule/schedule.dart';
+import 'package:scheduleme_application/screens/Calendar/calendar.dart';
 
 class MainBottom extends StatefulWidget {
   const MainBottom({super.key});
@@ -19,8 +19,7 @@ class _MainBottomState extends State<MainBottom> {
   Color selectItemColor = Color(0xff88889D);
 
   final pageList = [
-    const HomeScreen(),
-    const ScheduleScreen(),
+    const CalendarScreen(),
     const OverviewScreen(),
     const ProfileDisplayScreen()
   ];
@@ -42,29 +41,22 @@ class _MainBottomState extends State<MainBottom> {
           BottomNavigationBarItem(
             label: '',
             icon: Icon(
-              Icons.home,
+              Icons.calendar_month_outlined,
               color: selectedIndex == 0 ? Color(0xff392AAB) : selectItemColor,
             ),
           ),
           BottomNavigationBarItem(
             label: '',
             icon: Icon(
-              Icons.calendar_month_outlined,
-              color: selectedIndex == 1 ? Color(0xff392AAB) : selectItemColor,
-            ),
-          ),
-          BottomNavigationBarItem(
-            label: '',
-            icon: Icon(
               Icons.messenger_outline_rounded,
-              color: selectedIndex == 2 ? Color(0xff392AAB) : selectItemColor,
+              color: selectedIndex == 1 ? Color(0xff392AAB) : selectItemColor,
             ),
           ),
           BottomNavigationBarItem(
               label: '',
               icon: Icon(
                 Icons.person,
-                color: selectedIndex == 3 ? Color(0xff392AAB) : selectItemColor,
+                color: selectedIndex == 2 ? Color(0xff392AAB) : selectItemColor,
               ))
         ],
         type: BottomNavigationBarType.shifting,
