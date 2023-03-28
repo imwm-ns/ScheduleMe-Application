@@ -29,7 +29,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime? _selectedDate;
 
   Map<String, List> mySelectedEvents = {};
-  var currentInfo = [];
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -38,27 +37,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   final int numDay = DateTime.now().weekday;
   final int numMonth = DateTime.now().month;
   final int years = DateTime.now().year;
-
-  Future<void> _getCurrentUserData() async {
-    final currentUser = auth.currentUser!;
-    if (currentUser != Null) {
-      final collectionReference = fireStore.collection("Profile");
-      final documentReference = await collectionReference.get();
-      documentReference.docs.forEach((element) {
-        if (element.get("uid") == auth.currentUser!.uid) {
-          currentInfo = [
-            element.get("full_name").toString(),
-            element.get("id").toString(),
-            element.get("faculty").toString(),
-            element.get("major").toString(),
-            element.get("uid").toString(),
-            element.get("chatID").toString(),
-            element.get("email").toString(),
-          ];
-        }
-      });
-    }
-  }
 
   void _loadPreviousEvents() async {
     try {
@@ -81,7 +59,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   void initState() {
     super.initState();
     _selectedDate = _focusedDay;
-    _getCurrentUserData();
     _loadPreviousEvents();
   }
 
