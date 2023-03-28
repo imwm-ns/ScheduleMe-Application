@@ -172,7 +172,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   _showAddEventDialog() async {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
-    DateTime? selectedDate;
 
     await showDialog(
       context: context,
