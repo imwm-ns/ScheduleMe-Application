@@ -40,7 +40,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
           var currentInfo = [
             snapShotEmail.toString(),
             snapShotFullName.toString(),
-            snapShotID.toString()
+            snapShotID.toString(),
           ];
           searchAccount.add(currentInfo);
         }
