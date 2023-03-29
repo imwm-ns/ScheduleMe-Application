@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:scheduleme_application/models/chatmodel.dart';
 import 'package:scheduleme_application/screens/Chat/chat.dart';
+import 'package:scheduleme_application/screens/Chat/individual.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -17,6 +17,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
   late CollectionReference collectionReference = fireStore.collection('Profile');
   TextEditingController msgInputController = TextEditingController();
+
+  List<ChatModel> chats = [];
 
   String email = "";
   bool hasEmail = false;
@@ -45,6 +47,24 @@ class _OverviewScreenState extends State<OverviewScreen> {
           searchAccount.add(currentInfo);
         }
       });
+    }
+  }
+
+  showAccount(String msg) {
+    for (List account in searchAccount) {
+      if (account[0] == msg) {
+        chats.add(ChatModel(
+          name: account[1],
+          nickname: account[1].toString().substring(0, 1),
+          time: DateTime.now().hour.toString() + ":" + DateTime.now().minute.toString(),
+          currentMessage: "",
+        ));
+        return Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    IndividualScreen(chatModel: chats[chats.length - 1])));
+      }
     }
   }
 
@@ -90,6 +110,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       onPressed: () {
                         email = msgInputController.text;
                         hasEmail = true;
+                        showAccount(email);
                         setState(() {});
                         msgInputController.text = "";
                       },
@@ -101,45 +122,38 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 ),
               ),
             ),
-            SingleChildScrollView(
-              child: hasEmail ? showAccount(email) : Text(""),
-            )
+            chats.length == 0
+                ? Text("")
+                : Expanded(
+                    child: ListView.builder(
+                    itemCount: chats.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            return IndividualScreen(
+                              chatModel: chats[index],
+                            );
+                          }));
+                        },
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Color(0xff392AAB),
+                          foregroundColor: Colors.white,
+                          child: FittedBox(
+                            child: Text(chats[index].nickname),
+                          ),
+                        ),
+                        title: Text(chats[index].name),
+                        subtitle:
+                            Text(chats[index].currentMessage + " " + chats[index].time),
+                      );
+                    },
+                  ))
           ],
         ),
       ),
       backgroundColor: Color(0xffF5F5F5),
     );
-  }
-
-  TextButton showAccount(String msg) {
-    for (List account in searchAccount) {
-      if (account[0] == msg) {
-        return TextButton(
-          onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) {
-                email = "";
-                return const ChatScreen();
-              },
-            ));
-          },
-          child: Container(
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundColor: Color(0xff392AAB),
-                foregroundColor: Colors.white,
-                child: FittedBox(
-                  child: Text(account[1].toString().substring(0, 1)),
-                ),
-              ),
-              title: Text(account[1].toString()),
-              subtitle: Text(account[2].toString()),
-            ),
-          ),
-        );
-      }
-    }
-    return TextButton(onPressed: () {}, child: Container());
   }
 }

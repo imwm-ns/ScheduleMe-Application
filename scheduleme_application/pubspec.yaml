@@ -57,6 +57,7 @@ dev_dependencies:
 
 flutter_icons:
   android: true
+  adaptive_icon_background: "#392AAB"
   ios: true
   image_path: "assets/icon/scheduleme_logo.png"
   min_sdk_android: 21
@@ -79,7 +80,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/images/start_page.png
     - assets/icon/
 
   # To add assets to your application, add an assets section, like this:

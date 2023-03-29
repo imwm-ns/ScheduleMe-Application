@@ -117,44 +117,44 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Center(
-                        child: SizedBox(
-                          width: 180,
-                          height: 50,
-                          child: ElevatedButton(
-                            child: Text(
-                              "Reset Password",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff392AAB),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(40))),
-                            onPressed: () async {
-                              if (formKey.currentState!.validate()) {
-                                status = await resetPassword(email: email.text.trim());
-                                if (status == AuthStatus.successful) {
-                                  Navigator.pushReplacement(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return LoginScreen();
-                                  }));
-                                } else {
-                                  final error =
-                                      AuthExceptionHandler.generateErrorMessage(status);
-                                  Fluttertoast.showToast(
-                                    msg: "${status}",
-                                    gravity: ToastGravity.CENTER,
-                                  );
-                                }
-                              }
-                            },
-                          ),
+                    ],
+                  ),
+                ),
+                Center(
+                  child: SizedBox(
+                    width: 180,
+                    height: 50,
+                    child: ElevatedButton(
+                      child: Text(
+                        "Reset Password",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ],
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff392AAB),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40))),
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) {
+                          status = await resetPassword(email: email.text.trim());
+                          if (status == AuthStatus.successful) {
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) {
+                              return LoginScreen();
+                            }));
+                          } else {
+                            final error =
+                                AuthExceptionHandler.generateErrorMessage(status);
+                            Fluttertoast.showToast(
+                              msg: "${status}",
+                              gravity: ToastGravity.CENTER,
+                            );
+                          }
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],
