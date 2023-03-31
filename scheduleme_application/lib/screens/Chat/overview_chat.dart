@@ -19,6 +19,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   TextEditingController msgInputController = TextEditingController();
 
   List<ChatModel> chats = [];
+  ChatModel sourceChat = ChatModel(
+      name: "", nickname: "", time: "", currentMessage: "", status: "", chatID: 0);
 
   String email = "";
   bool hasEmail = false;
@@ -39,12 +41,24 @@ class _OverviewScreenState extends State<OverviewScreen> {
           final snapShotEmail = element.get("email");
           final snapShotFullName = element.get("full_name");
           final snapShotID = element.get("id");
+          final snapShotChatID = element.get("chatID");
           var currentInfo = [
             snapShotEmail.toString(),
             snapShotFullName.toString(),
-            snapShotID.toString(),
+            snapShotChatID.toString(),
           ];
           searchAccount.add(currentInfo);
+        } else {
+          var hour = DateTime.now().hour.toString();
+          var minute = DateTime.now().minute.toString();
+          if (hour == "0") hour = "00";
+          if (int.parse(minute) < 10) minute = "0" + minute;
+          sourceChat.name = element.get("full_name").toString();
+          sourceChat.nickname = element.get("full_name").toString().substring(0, 1);
+          sourceChat.currentMessage = "";
+          sourceChat.time = hour + ":" + minute;
+          sourceChat.status = "online";
+          sourceChat.chatID = int.parse(element.get("chatID").toString());
         }
       });
     }
@@ -53,17 +67,41 @@ class _OverviewScreenState extends State<OverviewScreen> {
   showAccount(String msg) {
     for (List account in searchAccount) {
       if (account[0] == msg) {
-        chats.add(ChatModel(
-          name: account[1],
-          nickname: account[1].toString().substring(0, 1),
-          time: DateTime.now().hour.toString() + ":" + DateTime.now().minute.toString(),
-          currentMessage: "",
-        ));
+        var hour = DateTime.now().hour.toString();
+        var minute = DateTime.now().minute.toString();
+        if (hour == "0") hour = "00";
+        if (int.parse(minute) < 10) minute = "0" + minute;
+        if (chats.length > 0) {
+          for (int i = 0; i < chats.length; i++) {
+            if (account[1] != chats[i].name) {
+              chats.add(ChatModel(
+                name: account[1],
+                nickname: account[1].toString().substring(0, 1),
+                time: hour + ":" + minute,
+                currentMessage: "",
+                status: "online",
+                chatID: int.parse(account[2]),
+              ));
+            }
+          }
+        } else {
+          chats.add(ChatModel(
+            name: account[1],
+            nickname: account[1].toString().substring(0, 1),
+            time: hour + ":" + minute,
+            currentMessage: "",
+            status: "online",
+            chatID: int.parse(account[2]),
+          ));
+        }
+        chats = chats.reversed.toList();
         return Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    IndividualScreen(chatModel: chats[chats.length - 1])));
+                builder: (context) => IndividualScreen(
+                      chatModel: chats[0],
+                      sourceChat: sourceChat,
+                    )));
       }
     }
   }
@@ -112,7 +150,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                         hasEmail = true;
                         showAccount(email);
                         setState(() {});
-                        msgInputController.text = "";
+                        msgInputController.clear();
                       },
                       icon: Icon(Icons.search),
                       iconSize: 28,
@@ -133,6 +171,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return IndividualScreen(
                               chatModel: chats[index],
+                              sourceChat: sourceChat,
                             );
                           }));
                         },
