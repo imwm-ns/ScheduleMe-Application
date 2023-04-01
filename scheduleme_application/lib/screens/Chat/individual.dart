@@ -31,16 +31,20 @@ class _IndividualScreenState extends State<IndividualScreen> {
   }
 
   void connect() {
-    socket = IO.io("${serverIP}:42000", <String, dynamic>{
-      "transports": ["websocket"],
-      "autoConnect": false,
-    });
+    socket = IO.io(
+        'https://scheduleme-application.web.app',
+        IO.OptionBuilder()
+            .setTransports(['websocket']) // set allowed transport protocols
+            .disableAutoConnect() // disable auto-connect feature
+            .build());
+
     socket.connect();
-    socket.emit("sign-in", widget.sourceChat.chatID);
-    socket.onConnect((data) {
-      print("Connected");
-      socket.on("message", (msg) {
-        setMessage("destination", msg["message"]);
+
+    socket.onConnect((_) {
+      print('Connected');
+      socket.emit('sign-in', widget.sourceChat.chatID);
+      socket.on('message', (msg) {
+        setMessage('destination', msg['message']);
         _scrollController.animateTo(_scrollController.position.maxScrollExtent,
             duration: Duration(milliseconds: 300), curve: Curves.easeOut);
       });
@@ -77,7 +81,9 @@ class _IndividualScreenState extends State<IndividualScreen> {
           leadingWidth: 120,
           leading: InkWell(
             onTap: () {
-              socket.disconnected;
+              socket.emit("disconnect", widget.sourceChat.chatID);
+              print("disconnected");
+              socket.disconnect();
               Navigator.pop(context);
             },
             child: Icon(

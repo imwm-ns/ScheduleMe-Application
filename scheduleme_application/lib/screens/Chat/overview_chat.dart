@@ -37,7 +37,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
       final collectionReference = fireStore.collection('Profile');
       final documentReference = await collectionReference.get();
       documentReference.docs.forEach((element) {
-        if (element.exists && element.get("email") != auth.currentUser!.email) {
+        if (element.exists && element.get('email') != auth.currentUser!.email) {
           final snapShotEmail = element.get("email");
           final snapShotFullName = element.get("full_name");
           final snapShotID = element.get("id");
