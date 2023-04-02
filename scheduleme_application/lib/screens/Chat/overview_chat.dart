@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:scheduleme_application/models/chatmodel.dart';
 import 'package:scheduleme_application/screens/Chat/chat.dart';
 import 'package:scheduleme_application/screens/Chat/individual.dart';
@@ -19,6 +20,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   TextEditingController msgInputController = TextEditingController();
 
   List<ChatModel> chats = [];
+  Map<String, List<dynamic>> mySelectedAccounts = {};
   ChatModel sourceChat = ChatModel(
       name: "", nickname: "", time: "", currentMessage: "", status: "", chatID: 0);
 
@@ -29,6 +31,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   void initState() {
     super.initState();
     _getCurrentUserData();
+    _loadPreviousAccount();
   }
 
   Future<void> _getCurrentUserData() async {
@@ -64,13 +67,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
     }
   }
 
-  showAccount(String msg) {
+  showAccount(String msg) async {
     for (List account in searchAccount) {
+      var hour = DateTime.now().hour.toString();
+      var minute = DateTime.now().minute.toString();
+      if (hour == "0") hour = "00";
+      if (int.parse(minute) < 10) minute = "0" + minute;
+
       if (account[0] == msg) {
-        var hour = DateTime.now().hour.toString();
-        var minute = DateTime.now().minute.toString();
-        if (hour == "0") hour = "00";
-        if (int.parse(minute) < 10) minute = "0" + minute;
         if (chats.length > 0) {
           for (int i = 0; i < chats.length; i++) {
             if (account[1] != chats[i].name) {
@@ -82,6 +86,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 status: "online",
                 chatID: int.parse(account[2]),
               ));
+              break;
             }
           }
         } else {
@@ -95,6 +100,21 @@ class _OverviewScreenState extends State<OverviewScreen> {
           ));
         }
         chats = chats.reversed.toList();
+        try {
+          List selectedChats = [
+            chats[0].name,
+            chats[0].status,
+            chats[0].time,
+            chats[0].chatID.toString()
+          ];
+          mySelectedAccounts[account[1].toString()] = selectedChats;
+          await collectionReference.doc(auth.currentUser!.uid).update({
+            "accounts":
+                mySelectedAccounts.map((key, value) => MapEntry(key, value.toList()))
+          });
+        } catch (e) {
+          print(e);
+        }
         return Navigator.push(
             context,
             MaterialPageRoute(
@@ -103,6 +123,38 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       sourceChat: sourceChat,
                     )));
       }
+    }
+  }
+
+  void _loadPreviousAccount() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('Profile')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      if (doc.exists) {
+        final accountsMap =
+            Map<String, List<dynamic>>.from(doc.data()!['accounts'] as Map);
+        setState(() {
+          mySelectedAccounts = accountsMap;
+          for (String name in mySelectedAccounts.keys) {
+            String accountName = mySelectedAccounts[name]![0];
+            String accountStatus = mySelectedAccounts[name]![1];
+            String accountTime = mySelectedAccounts[name]![2];
+            int accountChatID = int.parse(mySelectedAccounts[name]![3]);
+            chats.add(ChatModel(
+              name: accountName,
+              nickname: accountName.substring(0, 1),
+              time: accountTime,
+              currentMessage: "",
+              status: accountStatus,
+              chatID: accountChatID,
+            ));
+          }
+        });
+      }
+    } catch (e) {
+      print('Error loading previous accounts: $e');
     }
   }
 
