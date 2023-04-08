@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:scheduleme_application/models/chatmodel.dart';
-import 'package:scheduleme_application/screens/Chat/chat.dart';
 import 'package:scheduleme_application/screens/Chat/individual.dart';
 
 class OverviewScreen extends StatefulWidget {
@@ -219,7 +218,19 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     itemCount: chats.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        onTap: () {
+                        onTap: () async {
+                          chats[index].time = DateTime.now().toString().substring(11, 16);
+                          mySelectedAccounts[chats[index].name] = [
+                            chats[index].name,
+                            "online",
+                            DateTime.now().toString().substring(11, 16),
+                            chats[index].chatID.toString(),
+                          ];
+                          await collectionReference.doc(auth.currentUser!.uid).update({
+                            "accounts": mySelectedAccounts
+                                .map((key, value) => MapEntry(key, value.toList()))
+                          });
+                          setState(() {});
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return IndividualScreen(
                               chatModel: chats[index],
@@ -236,8 +247,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           ),
                         ),
                         title: Text(chats[index].name),
-                        subtitle:
-                            Text(chats[index].currentMessage + " " + chats[index].time),
+                        subtitle: Text(chats[index].time),
                       );
                     },
                   ))

@@ -37,9 +37,10 @@ class _IndividualScreenState extends State<IndividualScreen> {
     _loadPreviousChat();
   }
 
+  //http://exam.scheduleme:42000/'
   void connect() {
     socket = IO.io(
-        'http://exam.scheduleme:42000/',
+        'http://192.168.1.4:42000/',
         IO.OptionBuilder()
             .setTransports(['websocket']) // set allowed transport protocols
             .disableAutoConnect() // disable auto-connect feature
@@ -48,7 +49,6 @@ class _IndividualScreenState extends State<IndividualScreen> {
     socket.connect();
 
     socket.onConnect((_) {
-      print('Connected');
       socket.emit('sign-in', widget.sourceChat.chatID);
       socket.on('message', (msg) async {
         i++;
@@ -59,42 +59,19 @@ class _IndividualScreenState extends State<IndividualScreen> {
           i.toString()
         ];
         sourceMessage["destination ${i}"] = newMsg;
-        try {
-          historyMessage[widget.chatModel.chatID.toString()] = sourceMessage;
-          await FirebaseFirestore.instance
-              .collection('Profile')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({
-            "historyMessage": historyMessage.map((key, value) =>
-                MapEntry(key, value.map((key, value) => MapEntry(key, value.toList()))))
-          });
-        } catch (e) {
-          print('Error sending message: $e');
-        }
+        historyMessage[widget.chatModel.chatID.toString()] = sourceMessage;
         setMessage('destination', msg['message']);
         _scrollController.animateTo(_scrollController.position.maxScrollExtent,
             duration: Duration(milliseconds: 300), curve: Curves.easeOut);
       });
     });
-    print(socket.connected);
   }
 
   void sendMessage(String msg, int sourceID, int targetID) async {
     i++;
     List newMsg = ["source", _msg.text, DateTime.now().toString(), i.toString()];
     sourceMessage["source ${i}"] = newMsg;
-    try {
-      historyMessage[targetID.toString()] = sourceMessage;
-      await FirebaseFirestore.instance
-          .collection('Profile')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({
-        "historyMessage": historyMessage.map((key, value) =>
-            MapEntry(key, value.map((key, value) => MapEntry(key, value.toList()))))
-      });
-    } catch (e) {
-      print('Error sending message: $e');
-    }
+    historyMessage[targetID.toString()] = sourceMessage;
     setMessage("source", msg);
     socket.emit("message", {"message": msg, "sourceID": sourceID, "targetID": targetID});
   }
@@ -104,6 +81,7 @@ class _IndividualScreenState extends State<IndividualScreen> {
       type: type,
       message: msg,
       time: DateTime.now().toString(),
+      uniqueID: i.toString(),
     );
 
     setState(() {
@@ -118,30 +96,26 @@ class _IndividualScreenState extends State<IndividualScreen> {
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
       if (doc.exists) {
-        final historyMessage = doc.data()!['historyMessage'];
-        for (String id in historyMessage.keys) {
+        final history = doc.data()!['historyMessage'];
+        for (String id in history.keys) {
           if (int.parse(id) == widget.chatModel.chatID) {
-            for (String title in historyMessage[id].keys) {
-              sourceMessage[title] = historyMessage[id][title];
+            for (String title in history[id].keys) {
+              sourceMessage[title] = history[id][title];
               message.add(Message(
-                  type: historyMessage[id][title][0],
-                  message: historyMessage[id][title][1],
-                  time: historyMessage[id][title][2].toString().substring(11, 16)));
-              if (int.parse(historyMessage[id][title][3]) > i) {
-                i = int.parse(historyMessage[id][title][3]);
+                type: history[id][title][0],
+                message: history[id][title][1],
+                time: history[id][title][2].toString().substring(11, 16),
+                uniqueID: history[id][title][3],
+              ));
+              if (int.parse(history[id][title][3]) > i) {
+                i = int.parse(history[id][title][3]);
               }
             }
-            message.sort((a, b) {
-              int timeCompare = a.time.compareTo(b.time);
-              if (timeCompare != 0) {
-                return timeCompare;
-              } else {
-                return a.message.compareTo(b.message);
-              }
-            });
+            message
+                .sort((a, b) => int.parse(a.uniqueID).compareTo(int.parse(b.uniqueID)));
             setState(() {});
-            break;
           }
+          historyMessage[id] = history[id].cast<String, List<dynamic>>();
         }
       }
     } catch (e) {
@@ -159,10 +133,21 @@ class _IndividualScreenState extends State<IndividualScreen> {
           backgroundColor: Color(0xffF5F5F5),
           leadingWidth: 120,
           leading: InkWell(
-            onTap: () {
+            onTap: () async {
               socket.emit("disconnect", widget.sourceChat.chatID);
               print("disconnected");
               socket.disconnect();
+              try {
+                await FirebaseFirestore.instance
+                    .collection('Profile')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({
+                  "historyMessage": historyMessage.map((key, value) => MapEntry(
+                      key, value.map((key, value) => MapEntry(key, value.toList()))))
+                });
+              } catch (e) {
+                print('Error sending message: $e');
+              }
               Navigator.pop(context);
             },
             child: Icon(
