@@ -97,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             padding: const EdgeInsets.all(50.0),
                             child: Container(
                               alignment: Alignment.center,
-                              child: const Text("SIGN-IN",
+                              child: const Text("SIGN-UP",
                                   style: TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.w800,
@@ -233,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             backgroundColor: const Color(0xff392AAB),
                                             shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(40))),
-                                        child: const Text("SIGN-IN",
+                                        child: const Text("SIGN-UP",
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600)),

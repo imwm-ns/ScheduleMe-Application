@@ -37,10 +37,9 @@ class _IndividualScreenState extends State<IndividualScreen> {
     _loadPreviousChat();
   }
 
-  //http://exam.scheduleme:42000/'
   void connect() {
     socket = IO.io(
-        'http://192.168.1.4:42000/',
+        'http://192.168.1.36:42000/',
         IO.OptionBuilder()
             .setTransports(['websocket']) // set allowed transport protocols
             .disableAutoConnect() // disable auto-connect feature
